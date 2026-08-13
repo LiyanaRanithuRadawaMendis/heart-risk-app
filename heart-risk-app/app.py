@@ -1,14 +1,18 @@
+import os
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import joblib
 
-# 1. Load the saved model and scaler
-model = joblib.load('heart_disease_model.pkl')
-scaler = joblib.load('scaler.pkl')
+# 1. Get the absolute path of the directory where this app.py script is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# 2. Set Page Config & UI Design
-st.set_page_config(page_title="Heart Risk Predictor", layout="centered")
+# 2. Load the saved model and scaler using that absolute path
+model = joblib.load(os.path.join(BASE_DIR, 'heart_disease_model.pkl'))
+scaler = joblib.load(os.path.join(BASE_DIR, 'scaler.pkl'))
+
+st.set_page_config(page_title="Heart Risk Predictor", layout="wide")
 
 st.markdown("""
     <style>
