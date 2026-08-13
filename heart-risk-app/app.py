@@ -10,101 +10,94 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model = joblib.load(os.path.join(BASE_DIR, 'heart_disease_model.pkl'))
 scaler = joblib.load(os.path.join(BASE_DIR, 'scaler.pkl'))
 
-# 2. Page Configuration & Custom CSS for a Premium UI
+# 2. Page Configuration & Dark Red/Black Theme
 st.set_page_config(page_title="AI Cardiovascular Engine", layout="wide", initial_sidebar_state="collapsed")
 
 st.markdown("""
     <style>
-    .main { background-color: #0b0f19; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-    h1 { color: #38bdf8; text-align: center; margin-bottom: 0px; padding-bottom: 0px; }
-    p { text-align: center; color: #94a3b8; font-size: 1.1rem; }
-    .stButton>button { width: 100%; border-radius: 8px; background-color: #0ea5e9; color: white; border: none; padding: 12px; font-weight: bold; font-size: 16px; transition: all 0.3s; margin-top: 20px; }
-    .stButton>button:hover { background-color: #0284c7; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4); }
-    div[data-testid="stForm"] { border: 1px solid #1e293b; background-color: #0f172a; padding: 20px; border-radius: 12px; }
+    /* Main Background & Text */
+    .main { background-color: #050000; color: #fca5a5; font-family: 'Inter', sans-serif; }
+    h1 { color: #ef4444; text-align: center; margin-bottom: 0px; padding-bottom: 0px; letter-spacing: 1px; }
+    p { text-align: center; color: #f87171; font-size: 1.1rem; }
+    
+    /* Input Form Styling */
+    div[data-testid="stForm"] { border: 1px solid #450a0a; background-color: #0f0202; padding: 25px; border-radius: 12px; box-shadow: 0 0 20px rgba(239, 68, 68, 0.05); }
+    
+    /* Submit Button Styling */
+    .stButton>button { width: 100%; border-radius: 8px; background-color: #b91c1c; color: white; border: 1px solid #f87171; padding: 12px; font-weight: bold; font-size: 16px; transition: all 0.3s; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
+    .stButton>button:hover { background-color: #7f1d1d; transform: translateY(-2px); box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); border-color: #ef4444; }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🫀 AI Cardiovascular Diagnostic Engine")
-st.write("Enter clinical vitals to initiate a predictive health scan.")
+st.title("🩸 CARDIAC TELEMETRY AI")
+st.write("Enter patient vitals to initiate predictive scanning sequence.")
 
-# 3. Central Animation Display (The "3D" Hologram Heart)
+# 3. Central Animation Display (The EKG Redline)
 animation_placeholder = st.empty()
 
-# Default Scanning State Animation (Blue/Scanning)
-default_html = """
-<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 450px; width: 100%; background: radial-gradient(circle, #1e293b 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #334155; position: relative; overflow: hidden;">
-    <div style="position: absolute; width: 200%; height: 3px; background: rgba(56, 189, 248, 0.8); box-shadow: 0 0 20px #38bdf8; animation: scan 3s linear infinite;"></div>
+# Default State: Standby EKG
+default_ekg = """
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 350px; width: 100%; background: #000000; border-radius: 12px; border: 2px solid #450a0a; position: relative; overflow: hidden;">
     
-    <!-- Realistic Anatomical Heart -->
-    <img id="heart" src="https://img.icons8.com/color/512/heart-anatomy.png" style="width: 220px; filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6)) grayscale(40%) hue-rotate(180deg); animation: heartbeat 2s infinite;">
+    <!-- EKG Grid Background -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(239, 68, 68, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
     
-    <div style="color: #38bdf8; margin-top: 30px; font-weight: 900; font-size: 22px; letter-spacing: 3px; text-transform: uppercase; animation: textPulse 1.5s infinite;">Awaiting Vitals...</div>
+    <!-- Top Right BPM Display -->
+    <div style="position: absolute; top: 15px; right: 25px; color: #ef4444; font-family: monospace; font-size: 32px; font-weight: bold;">
+        ❤️ 72 BPM
+    </div>
+    
+    <!-- Animated EKG Line (Pure CSS/SVG) -->
+    <div style="width: 100%; height: 150px; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"150\"><path d=\"M0,75 L100,75 L110,40 L125,130 L140,75 L300,75\" fill=\"none\" stroke=\"%23ef4444\" stroke-width=\"4\" stroke-linejoin=\"round\"/></svg>'); background-repeat: repeat-x; animation: monitorSlide 3s linear infinite; filter: drop-shadow(0 0 8px #ef4444);"></div>
+    
+    <div style="color: #ef4444; margin-top: 20px; font-weight: bold; letter-spacing: 4px; font-family: monospace; font-size: 18px; animation: blink 1.5s infinite;">SYSTEM STANDBY - AWAITING INPUT</div>
     
     <style>
-        /* Realistic double-beat rhythm */
-        @keyframes heartbeat { 
-            0% { transform: scale(1); } 
-            10% { transform: scale(1.08); } 
-            20% { transform: scale(1); } 
-            30% { transform: scale(1.08); } 
-            100% { transform: scale(1); } 
-        }
-        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
-        @keyframes textPulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        @keyframes monitorSlide { from { background-position: 0 0; } to { background-position: -300px 0; } }
+        @keyframes blink { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
     </style>
 </div>
 """
 with animation_placeholder:
-    components.html(default_html, height=460)
+    components.html(default_ekg, height=360)
 
 st.markdown("---")
 
 # 4. Data Entry Section using a Form
 with st.form("clinical_form"):
     st.subheader("Patient Clinical Attributes")
-    
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        age = st.number_input("Age", 1, 120, 50, help="The patient's age in years.")
-        
+        age = st.number_input("Age", 1, 120, 50)
         sex_map = {"Female": 0, "Male": 1}
-        sex_choice = st.selectbox("Biological Sex", list(sex_map.keys()), help="Biological sex of the patient.")
-        
+        sex_choice = st.selectbox("Biological Sex", list(sex_map.keys()))
         cp_map = {"Typical Angina": 0, "Atypical Angina": 1, "Non-anginal Pain": 2, "Asymptomatic": 3}
-        cp_choice = st.selectbox("Chest Pain Type", list(cp_map.keys()), help="Type of chest pain reported by the patient.")
-        
-        trestbps = st.number_input("Resting Blood Pressure", 80.0, 200.0, 120.0, help="Resting blood pressure in mm Hg upon admission.")
-        
-        chol = st.number_input("Serum Cholesterol", 100.0, 600.0, 200.0, help="Serum cholesterol in mg/dl. (Values over 200 may indicate concern).")
+        cp_choice = st.selectbox("Chest Pain Type", list(cp_map.keys()))
+        trestbps = st.number_input("Resting Blood Pressure", 80.0, 200.0, 120.0)
+        chol = st.number_input("Serum Cholesterol", 100.0, 600.0, 200.0)
 
     with col2:
         fbs_map = {"Under 120 mg/dl (Normal)": 0, "Over 120 mg/dl (Elevated)": 1}
-        fbs_choice = st.selectbox("Fasting Blood Sugar", list(fbs_map.keys()), help="Is fasting blood sugar > 120 mg/dl?")
-        
+        fbs_choice = st.selectbox("Fasting Blood Sugar", list(fbs_map.keys()))
         restecg_map = {"Normal": 0, "ST-T Wave Abnormality": 1, "Left Ventricular Hypertrophy": 2}
-        restecg_choice = st.selectbox("Resting ECG Results", list(restecg_map.keys()), help="Results from the resting electrocardiogram.")
-        
-        thalch = st.number_input("Maximum Heart Rate", 60.0, 220.0, 150.0, help="Maximum heart rate achieved during exercise testing.")
-        
+        restecg_choice = st.selectbox("Resting ECG Results", list(restecg_map.keys()))
+        thalch = st.number_input("Maximum Heart Rate", 60.0, 220.0, 150.0)
         exang_map = {"No": 0, "Yes": 1}
-        exang_choice = st.selectbox("Exercise Induced Angina", list(exang_map.keys()), help="Did exercise induce angina (chest pain)?")
+        exang_choice = st.selectbox("Exercise Induced Angina", list(exang_map.keys()))
 
     with col3:
-        oldpeak = st.number_input("ST Depression (Oldpeak)", 0.0, 6.0, 1.0, step=0.1, help="ST depression induced by exercise relative to rest.")
-        
+        oldpeak = st.number_input("ST Depression (Oldpeak)", 0.0, 6.0, 1.0, step=0.1)
         slope_map = {"Upsloping": 0, "Flat": 1, "Downsloping": 2}
-        slope_choice = st.selectbox("ST Segment Slope", list(slope_map.keys()), help="The slope of the peak exercise ST segment.")
-        
+        slope_choice = st.selectbox("ST Segment Slope", list(slope_map.keys()))
         ca_map = {"0 Vessels": 0, "1 Vessel": 1, "2 Vessels": 2, "3 Vessels": 3}
-        ca_choice = st.selectbox("Fluoroscopy Colored Vessels", list(ca_map.keys()), help="Number of major vessels colored by fluoroscopy.")
-        
+        ca_choice = st.selectbox("Fluoroscopy Colored Vessels", list(ca_map.keys()))
         thal_map = {"Normal": 0, "Fixed Defect": 1, "Reversable Defect": 2}
-        thal_choice = st.selectbox("Thalassemia", list(thal_map.keys()), help="Blood disorder status.")
+        thal_choice = st.selectbox("Thalassemia", list(thal_map.keys()))
 
-    submit_button = st.form_submit_button("Run Diagnostic Prediction")
+    submit_button = st.form_submit_button("INITIATE SCAN")
 
-# 5. Prediction Logic and Dynamic Animation Trigger
+# 5. Prediction Logic and Dynamic EKG Update
 if submit_button:
     input_data = pd.DataFrame([[
         age, sex_map[sex_choice], cp_map[cp_choice], trestbps, chol, 
@@ -117,67 +110,68 @@ if submit_button:
     prediction = model.predict(input_scaled)
     probability = model.predict_proba(input_scaled)[0][1]
     
+    # Grab the user's inputted Max Heart Rate to display on the monitor!
+    display_bpm = int(thalch)
+    
     if prediction[0] == 1:
-        st.error(f"⚠️ **High Cardiovascular Risk Detected** (Model Confidence: {probability:.2%})")
+        st.error(f"⚠️ **CRITICAL ALERT:** Elevated risk of cardiovascular disease. (Confidence: {probability:.2%})")
         
-        # High Risk Animation: Flashing red background, aggressive double-beat, large alert text
-        high_risk_html = """
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 450px; width: 100%; border-radius: 12px; border: 2px solid #ef4444; position: relative; overflow: hidden; animation: bgFlash 1s infinite;">
+        # High Risk EKG: Fast, erratic line with issue description
+        high_risk_ekg = f"""
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 350px; width: 100%; background: #1a0000; border-radius: 12px; border: 3px solid #ef4444; position: relative; overflow: hidden; animation: bgFlash 0.8s infinite;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(239, 68, 68, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
             
-            <!-- Large Left Warning -->
-            <div style="position: absolute; top: 20%; left: 5%; background: rgba(0,0,0,0.9); padding: 15px 25px; border-radius: 8px; color: #f87171; border-left: 6px solid #ef4444; font-size: 18px; font-weight: 900; font-family: sans-serif; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);">
-                ⚠️ ARTERIAL BLOCKAGE<br><span style="font-size: 14px; font-weight: normal; color: #fca5a5;">Reduced Blood Flow Detected</span>
+            <div style="position: absolute; top: 15px; right: 25px; color: #ef4444; font-family: monospace; font-size: 32px; font-weight: bold; text-shadow: 0 0 10px #ef4444;">
+                ⚠️ {display_bpm} BPM
             </div>
             
-            <!-- Large Right Warning -->
-            <div style="position: absolute; bottom: 20%; right: 5%; background: rgba(0,0,0,0.9); padding: 15px 25px; border-radius: 8px; color: #f87171; border-left: 6px solid #ef4444; font-size: 18px; font-weight: 900; font-family: sans-serif; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);">
-                ⚠️ VENTRICULAR STRESS<br><span style="font-size: 14px; font-weight: normal; color: #fca5a5;">High Strain Index</span>
+            <!-- Warning Description Box -->
+            <div style="position: absolute; top: 15px; left: 25px; background: rgba(0,0,0,0.8); padding: 10px 15px; border-left: 5px solid #ef4444; color: #fca5a5; font-family: sans-serif; font-size: 14px; max-width: 300px;">
+                <b style="color: #ef4444; font-size: 16px;">Vascular Anomaly Detected</b><br>
+                Model indicates elevated probability of coronary artery disease or compromised ventricular function based on clinical indicators.
             </div>
 
-            <img id="heart" src="https://img.icons8.com/color/512/heart-anatomy.png" style="width: 250px; filter: drop-shadow(0 0 35px #ef4444) saturate(2); animation: aggressiveBeat 0.7s infinite;">
+            <!-- Faster, Erratic EKG Line -->
+            <div style="width: 100%; height: 150px; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"150\"><path d=\"M0,75 L40,75 L50,10 L70,140 L90,75 L200,75\" fill=\"none\" stroke=\"%23ef4444\" stroke-width=\"5\" stroke-linejoin=\"round\"/></svg>'); background-repeat: repeat-x; animation: monitorSlide 0.7s linear infinite; filter: drop-shadow(0 0 12px #ef4444);"></div>
             
-            <div style="color: #ef4444; margin-top: 30px; font-weight: 900; font-size: 26px; letter-spacing: 2px; text-transform: uppercase; animation: textPulse 0.7s infinite; text-shadow: 0 0 10px #ef4444;">Critical Anomaly Detected</div>
+            <div style="color: #ef4444; margin-top: 20px; font-weight: 900; letter-spacing: 5px; font-family: monospace; font-size: 24px; text-shadow: 0 0 15px #ef4444;">CRITICAL ABNORMALITY</div>
             
             <style>
-                @keyframes aggressiveBeat { 
-                    0% { transform: scale(1); } 
-                    15% { transform: scale(1.15); } 
-                    30% { transform: scale(1); } 
-                    45% { transform: scale(1.15); } 
-                    100% { transform: scale(1); } 
-                }
-                @keyframes bgFlash {
-                    0% { background: radial-gradient(circle, #3f0c0c 0%, #0b0f19 80%); }
-                    50% { background: radial-gradient(circle, #5c0808 0%, #150505 80%); }
-                    100% { background: radial-gradient(circle, #3f0c0c 0%, #0b0f19 80%); }
-                }
-                @keyframes textPulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+                @keyframes monitorSlide {{ from {{ background-position: 0 0; }} to {{ background-position: -200px 0; }} }}
+                @keyframes bgFlash {{ 0% {{ background-color: #1a0000; }} 50% {{ background-color: #3f0000; }} 100% {{ background-color: #1a0000; }} }}
             </style>
         </div>
         """
         with animation_placeholder:
-            components.html(high_risk_html, height=460)
+            components.html(high_risk_ekg, height=360)
         
     else:
-        st.success(f"✅ **Low Risk / Normal Function** (Model Confidence: {1 - probability:.2%})")
+        st.success(f"✅ **NORMAL FUNCTION:** No critical risk detected. (Confidence: {1 - probability:.2%})")
         
-        # Low Risk Animation: Smooth, calm green double-pulse
-        low_risk_html = """
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 450px; width: 100%; background: radial-gradient(circle, #064e3b 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #065f46; position: relative; overflow: hidden;">
-            <img id="heart" src="https://img.icons8.com/color/512/heart-anatomy.png" style="width: 220px; filter: drop-shadow(0 0 25px #10b981) hue-rotate(90deg); animation: calmBeat 2s infinite;">
+        # Low Risk EKG: Smooth green line with normal description
+        low_risk_ekg = f"""
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 350px; width: 100%; background: #000000; border-radius: 12px; border: 2px solid #064e3b; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(16, 185, 129, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(16, 185, 129, 0.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
             
-            <div style="color: #10b981; margin-top: 30px; font-weight: 900; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;">Stable Rhythm</div>
+            <div style="position: absolute; top: 15px; right: 25px; color: #10b981; font-family: monospace; font-size: 32px; font-weight: bold; text-shadow: 0 0 10px #10b981;">
+                ✅ {display_bpm} BPM
+            </div>
+            
+            <!-- Clear Description Box -->
+            <div style="position: absolute; top: 15px; left: 25px; background: rgba(0,0,0,0.8); padding: 10px 15px; border-left: 5px solid #10b981; color: #6ee7b7; font-family: sans-serif; font-size: 14px; max-width: 300px;">
+                <b style="color: #10b981; font-size: 16px;">Sinus Rhythm Normal</b><br>
+                Cardiovascular indicators fall within healthy parameters. No immediate signs of arterial blockage.
+            </div>
+
+            <!-- Smooth Green EKG Line -->
+            <div style="width: 100%; height: 150px; background-image: url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"150\"><path d=\"M0,75 L100,75 L110,50 L125,120 L140,75 L300,75\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"4\" stroke-linejoin=\"round\"/></svg>'); background-repeat: repeat-x; animation: monitorSlide 3s linear infinite; filter: drop-shadow(0 0 10px #10b981);"></div>
+            
+            <div style="color: #10b981; margin-top: 20px; font-weight: bold; letter-spacing: 4px; font-family: monospace; font-size: 18px;">VITALS STABLE</div>
             
             <style>
-                @keyframes calmBeat { 
-                    0% { transform: scale(1); } 
-                    10% { transform: scale(1.05); } 
-                    20% { transform: scale(1); } 
-                    30% { transform: scale(1.05); } 
-                    100% { transform: scale(1); } 
-                }
+                @keyframes monitorSlide {{ from {{ background-position: 0 0; }} to {{ background-position: -300px 0; }} }}
             </style>
         </div>
         """
         with animation_placeholder:
-            components.html(low_risk_html, height=460)
+            components.html(low_risk_ekg, height=360)
