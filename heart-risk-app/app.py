@@ -43,7 +43,8 @@ default_html = """
     </style>
 </div>
 """
-animation_placeholder.components.v1.html(default_html, height=360)
+with animation_placeholder:
+    components.html(default_html, height=360)
 
 st.markdown("---")
 
@@ -123,7 +124,8 @@ if submit_button:
             </style>
         </div>
         """
-        animation_placeholder.components.v1.html(high_risk_html, height=360)
+        with animation_placeholder:
+            components.html(high_risk_html, height=360)
         
     else:
         st.success(f"✅ **Low Risk / Normal Function** (Model Confidence: {1 - probability:.2%})")
@@ -138,4 +140,5 @@ if submit_button:
             </style>
         </div>
         """
-        animation_placeholder.components.v1.html(low_risk_html, height=360)
+        with animation_placeholder:
+            components.html(low_risk_html, height=360)
