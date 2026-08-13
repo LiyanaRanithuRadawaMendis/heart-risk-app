@@ -30,29 +30,39 @@ st.write("Enter clinical vitals to initiate a predictive health scan.")
 # 3. Central Animation Display (The "3D" Hologram Heart)
 animation_placeholder = st.empty()
 
-# Default Scanning State Animation
+# Default Scanning State Animation (Blue/Scanning)
 default_html = """
-<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 350px; width: 100%; background: radial-gradient(circle, #1e293b 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #334155; position: relative; overflow: hidden;">
-    <div style="position: absolute; width: 200%; height: 2px; background: rgba(56, 189, 248, 0.5); box-shadow: 0 0 15px #38bdf8; animation: scan 3s linear infinite;"></div>
-    <!-- Replace the src URL below with a link to your own custom 2D anatomical asset if desired -->
-    <img id="heart" src="https://cdn-icons-png.flaticon.com/512/873/873295.png" style="width: 180px; filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.6)) grayscale(80%) sepia(20%) hue-rotate(180deg); animation: pulse 1.5s infinite;">
-    <div style="color: #38bdf8; margin-top: 20px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">Awaiting Vitals...</div>
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 450px; width: 100%; background: radial-gradient(circle, #1e293b 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #334155; position: relative; overflow: hidden;">
+    <div style="position: absolute; width: 200%; height: 3px; background: rgba(56, 189, 248, 0.8); box-shadow: 0 0 20px #38bdf8; animation: scan 3s linear infinite;"></div>
+    
+    <!-- Realistic Anatomical Heart -->
+    <img id="heart" src="https://img.icons8.com/color/512/heart-anatomy.png" style="width: 220px; filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6)) grayscale(40%) hue-rotate(180deg); animation: heartbeat 2s infinite;">
+    
+    <div style="color: #38bdf8; margin-top: 30px; font-weight: 900; font-size: 22px; letter-spacing: 3px; text-transform: uppercase; animation: textPulse 1.5s infinite;">Awaiting Vitals...</div>
+    
     <style>
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* Realistic double-beat rhythm */
+        @keyframes heartbeat { 
+            0% { transform: scale(1); } 
+            10% { transform: scale(1.08); } 
+            20% { transform: scale(1); } 
+            30% { transform: scale(1.08); } 
+            100% { transform: scale(1); } 
+        }
         @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+        @keyframes textPulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </div>
 """
 with animation_placeholder:
-    components.html(default_html, height=360)
+    components.html(default_html, height=460)
 
 st.markdown("---")
 
-# 4. Data Entry Section using a Form (Prevents app from reloading on every single click)
+# 4. Data Entry Section using a Form
 with st.form("clinical_form"):
     st.subheader("Patient Clinical Attributes")
     
-    # We use columns to organize the inputs neatly under the central heart
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -92,12 +102,10 @@ with st.form("clinical_form"):
         thal_map = {"Normal": 0, "Fixed Defect": 1, "Reversable Defect": 2}
         thal_choice = st.selectbox("Thalassemia", list(thal_map.keys()), help="Blood disorder status.")
 
-    # Submit button for the form
     submit_button = st.form_submit_button("Run Diagnostic Prediction")
 
 # 5. Prediction Logic and Dynamic Animation Trigger
 if submit_button:
-    # Convert text selections back to integers for the model
     input_data = pd.DataFrame([[
         age, sex_map[sex_choice], cp_map[cp_choice], trestbps, chol, 
         fbs_map[fbs_choice], restecg_map[restecg_choice], thalch, 
@@ -112,33 +120,64 @@ if submit_button:
     if prediction[0] == 1:
         st.error(f"⚠️ **High Cardiovascular Risk Detected** (Model Confidence: {probability:.2%})")
         
-        # High Risk Animation: Aggressive pulse, red alerts, highlighting text
+        # High Risk Animation: Flashing red background, aggressive double-beat, large alert text
         high_risk_html = """
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 350px; width: 100%; background: radial-gradient(circle, #450a0a 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #7f1d1d; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: 15%; left: 10%; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 4px; color: #f87171; border-left: 3px solid #ef4444; font-size: 12px;">Arterial Blockage Warning</div>
-            <div style="position: absolute; bottom: 15%; right: 10%; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 4px; color: #f87171; border-left: 3px solid #ef4444; font-size: 12px;">Ventricular Stress High</div>
-            <img id="heart" src="https://cdn-icons-png.flaticon.com/512/873/873295.png" style="width: 220px; filter: drop-shadow(0 0 30px #ef4444); animation: fastPulse 0.6s infinite;">
-            <div style="color: #ef4444; margin-top: 20px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">Critical Anomaly Detected</div>
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 450px; width: 100%; border-radius: 12px; border: 2px solid #ef4444; position: relative; overflow: hidden; animation: bgFlash 1s infinite;">
+            
+            <!-- Large Left Warning -->
+            <div style="position: absolute; top: 20%; left: 5%; background: rgba(0,0,0,0.9); padding: 15px 25px; border-radius: 8px; color: #f87171; border-left: 6px solid #ef4444; font-size: 18px; font-weight: 900; font-family: sans-serif; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);">
+                ⚠️ ARTERIAL BLOCKAGE<br><span style="font-size: 14px; font-weight: normal; color: #fca5a5;">Reduced Blood Flow Detected</span>
+            </div>
+            
+            <!-- Large Right Warning -->
+            <div style="position: absolute; bottom: 20%; right: 5%; background: rgba(0,0,0,0.9); padding: 15px 25px; border-radius: 8px; color: #f87171; border-left: 6px solid #ef4444; font-size: 18px; font-weight: 900; font-family: sans-serif; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);">
+                ⚠️ VENTRICULAR STRESS<br><span style="font-size: 14px; font-weight: normal; color: #fca5a5;">High Strain Index</span>
+            </div>
+
+            <img id="heart" src="https://img.icons8.com/color/512/heart-anatomy.png" style="width: 250px; filter: drop-shadow(0 0 35px #ef4444) saturate(2); animation: aggressiveBeat 0.7s infinite;">
+            
+            <div style="color: #ef4444; margin-top: 30px; font-weight: 900; font-size: 26px; letter-spacing: 2px; text-transform: uppercase; animation: textPulse 0.7s infinite; text-shadow: 0 0 10px #ef4444;">Critical Anomaly Detected</div>
+            
             <style>
-                @keyframes fastPulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+                @keyframes aggressiveBeat { 
+                    0% { transform: scale(1); } 
+                    15% { transform: scale(1.15); } 
+                    30% { transform: scale(1); } 
+                    45% { transform: scale(1.15); } 
+                    100% { transform: scale(1); } 
+                }
+                @keyframes bgFlash {
+                    0% { background: radial-gradient(circle, #3f0c0c 0%, #0b0f19 80%); }
+                    50% { background: radial-gradient(circle, #5c0808 0%, #150505 80%); }
+                    100% { background: radial-gradient(circle, #3f0c0c 0%, #0b0f19 80%); }
+                }
+                @keyframes textPulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
             </style>
         </div>
         """
         with animation_placeholder:
-            components.html(high_risk_html, height=360)
+            components.html(high_risk_html, height=460)
         
     else:
         st.success(f"✅ **Low Risk / Normal Function** (Model Confidence: {1 - probability:.2%})")
         
-        # Low Risk Animation: Smooth, calm green pulse
+        # Low Risk Animation: Smooth, calm green double-pulse
         low_risk_html = """
-        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 350px; width: 100%; background: radial-gradient(circle, #064e3b 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #065f46; position: relative; overflow: hidden;">
-            <img id="heart" src="https://cdn-icons-png.flaticon.com/512/873/873295.png" style="width: 180px; filter: drop-shadow(0 0 20px #10b981) hue-rotate(90deg); animation: calmPulse 2s infinite;">
-            <div style="color: #10b981; margin-top: 20px; font-weight: bold; letter-spacing: 2px; text-transform: uppercase;">Stable Rhythm</div>
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 450px; width: 100%; background: radial-gradient(circle, #064e3b 0%, #0b0f19 70%); border-radius: 12px; border: 1px solid #065f46; position: relative; overflow: hidden;">
+            <img id="heart" src="https://img.icons8.com/color/512/heart-anatomy.png" style="width: 220px; filter: drop-shadow(0 0 25px #10b981) hue-rotate(90deg); animation: calmBeat 2s infinite;">
+            
+            <div style="color: #10b981; margin-top: 30px; font-weight: 900; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;">Stable Rhythm</div>
+            
             <style>
-                @keyframes calmPulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+                @keyframes calmBeat { 
+                    0% { transform: scale(1); } 
+                    10% { transform: scale(1.05); } 
+                    20% { transform: scale(1); } 
+                    30% { transform: scale(1.05); } 
+                    100% { transform: scale(1); } 
+                }
             </style>
         </div>
         """
         with animation_placeholder:
-            components.html(low_risk_html, height=360)
+            components.html(low_risk_html, height=460)
