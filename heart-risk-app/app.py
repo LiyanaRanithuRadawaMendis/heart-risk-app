@@ -673,15 +673,13 @@ if submitted:
             st.markdown(render_feature_importance(), unsafe_allow_html=True)
             st.markdown(render_population_chips(raw), unsafe_allow_html=True)
 
-        with st.expander("View interactive 3D heart model (experimental)"):
-            st.caption("Stylized schematic model, not medical-grade anatomy. Best viewed after deploying — "
-                       "this needs a live internet connection to load the 3D library.")
+        with st.expander("View interactive 3D heart model"):
+            st.caption("Stylized schematic model, not medical-grade anatomy")
             components.html(render_3d_heart(tier_key, category), height=390)
 
 st.markdown("""
 <div class="disclaimer">
 CardioScope is a machine-learning screening aid trained on historical clinical data.
-It does not diagnose disease and is not a substitute for professional medical evaluation —
-share these results with a clinician rather than acting on them alone.
+It does not diagnose disease and is not a substitute for professional medical evaluation.
 </div>
 """, unsafe_allow_html=True)
