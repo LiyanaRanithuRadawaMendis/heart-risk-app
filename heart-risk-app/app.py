@@ -5,9 +5,6 @@ import pandas as pd
 import numpy as np
 import joblib
 
-# ----------------------------------------------------------------------------
-# 1. Paths, page config, model loading
-# ----------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 st.set_page_config(
@@ -38,8 +35,7 @@ FEATURE_LABELS = {
     "ca": "Vessels colored by fluoroscopy", "thal": "Thalassemia",
 }
 
-# which broad category each feature speaks to, used to pick which
-# explanation / diagram zone to surface after a prediction
+
 FEATURE_CATEGORY = {
     "age": "metabolic", "sex": "metabolic", "fbs": "metabolic",
     "cp": "coronary", "exang": "coronary", "oldpeak": "coronary",
@@ -114,13 +110,7 @@ def hexs(hexcolor):
     return hexcolor.replace("#", "%23")
 
 
-# ----------------------------------------------------------------------------
-# 2. Risk tiers. Brand chrome (buttons, headings, standby state) uses red as
-#    requested. Low / moderate / high keep green -> amber -> red, since that
-#    traffic-light convention is what makes the result readable at a glance;
-#    making "low risk" red too would undercut that. Flag if you'd rather have
-#    all four states on a single red scale instead.
-# ----------------------------------------------------------------------------
+
 ACCENT = "#DC2626"
 ACCENT_DARK = "#7F1D1D"
 
@@ -135,9 +125,7 @@ TIERS = {
              "label": "Elevated risk", "sub": "Multiple indicators are concerning"},
 }
 
-# ----------------------------------------------------------------------------
-# 3. Global theme
-# ----------------------------------------------------------------------------
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
@@ -211,11 +199,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-# ----------------------------------------------------------------------------
-# 4. Vitals monitor component (heart + ECG + gauge) — rendered inside its own
-#    iframe via components.html, so raw HTML/CSS here is always safe.
-# ----------------------------------------------------------------------------
 def render_monitor(bpm, probability):
     tier_key = tier_from_probability(probability)
     tier = TIERS[tier_key]
@@ -322,14 +305,6 @@ def render_monitor(bpm, probability):
     </div>
     """
 
-
-# ----------------------------------------------------------------------------
-# 5. Insight panels — built as SINGLE-LINE html strings. Streamlit's markdown
-#    renderer treats any line indented 4+ spaces as a preformatted code block
-#    (a CommonMark rule), which is what caused raw tags to print on screen
-#    last time. Keeping each fragment on one line, with no leading
-#    whitespace, avoids that entirely.
-# ----------------------------------------------------------------------------
 def render_feature_importance():
     importances = getattr(model, "feature_importances_", None)
     if importances is None:
@@ -422,24 +397,13 @@ def render_explanation(row, probability, tier_key):
             f'{notes_html}</div></div></div>')
 
 
-# ----------------------------------------------------------------------------
-# 6. Optional 3D heart (experimental). This is a stylized, schematic model
-#    built from simple geometry with animated flow particles and a highlight
-#    marker — not an anatomically precise medical rendering. Accurate 3D
-#    anatomy normally comes from licensed medical asset libraries, which
-#    isn't something that can be generated from scratch here. I wasn't able
-#    to render-test WebGL in my sandbox either (no browser/GPU access there),
-#    so check this view once after you deploy.
-# ----------------------------------------------------------------------------
 def render_3d_heart(tier_key, category_key):
     tier = TIERS[tier_key]
     info = CATEGORY_INFO[category_key]
     zone_label = info["label"]
     light = tier["light"]
     dark = tier["dark"]
-    # Pre-compute the JS zone literal here (not inline in the f-string below) so this
-    # stays compatible with Python < 3.12, which doesn't allow an f-string expression
-    # to reuse the same quote character as the string's own delimiter.
+    
     if info["zone"]:
         zx = (info["zone"][0] - 110) / 28.2
         zy = (107 - info["zone"][1]) / 28.2
@@ -576,9 +540,6 @@ def render_3d_heart(tier_key, category_key):
     """
 
 
-# ----------------------------------------------------------------------------
-# 7. Layout: intake form (left) + live vitals monitor (right)
-# ----------------------------------------------------------------------------
 left, right = st.columns([1.15, 1], gap="large")
 
 with right:
@@ -642,9 +603,6 @@ with left:
 
         submitted = st.form_submit_button("Run assessment")
 
-# ----------------------------------------------------------------------------
-# 8. Prediction + updating the monitor / insight panels
-# ----------------------------------------------------------------------------
 if submitted:
     raw = {
         "age": age, "sex": sex_map.get(sex_choice), "cp": cp_map.get(cp_choice),
